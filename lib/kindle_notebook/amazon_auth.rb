@@ -11,11 +11,12 @@ module KindleNotebook
 
     def sign_in
       session.visit(url)
-      session.click_button("Sign in with your account", match: :first)
-      session.fill_in("ap_email", with: login)
-      session.fill_in("ap_password", with: password)
-      session.first("#signInSubmit").click
-      submit_otp_form
+      if session.find_latest_cookie_file
+        session.restore_cookies
+        session.refresh
+      else
+        submit_sign_in_form
+      end
       session
     end
 
@@ -29,6 +30,16 @@ module KindleNotebook
       mfa_code = gets.chomp
       session.fill_in("auth-mfa-otpcode", with: mfa_code)
       session.first("#auth-signin-button").click
+    end
+
+    def submit_sign_in_form
+      session.click_button("Sign in with your account", match: :first)
+      session.fill_in("ap_email", with: login)
+      session.fill_in("ap_password", with: password)
+      session.check("rememberMe")
+      session.first("#signInSubmit").click
+      submit_otp_form
+      session.save_cookies
     end
   end
 end
