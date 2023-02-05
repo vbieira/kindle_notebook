@@ -5,7 +5,7 @@ RSpec.describe KindleNotebook do
     expect(KindleNotebook::VERSION).not_to be nil
   end
 
-  xit "does something useful" do
-    expect(false).to eq(true)
-  end
+  # xit "does something useful" do
+  #   expect(false).to eq(true)
+  # end
 end
