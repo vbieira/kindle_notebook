@@ -5,6 +5,7 @@ require "capybara/sessionkeeper"
 require "dotenv"
 
 require_relative "kindle_notebook/amazon_auth"
+require_relative "kindle_notebook/highlights"
 require_relative "kindle_notebook/version"
 
 Dotenv.load

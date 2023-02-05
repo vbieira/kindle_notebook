@@ -16,14 +16,14 @@ module KindleNotebook
         session.refresh
       else
         submit_sign_in_form
+        session.save_cookies
       end
       session
     end
 
     private
 
-    attr_accessor :session
-    attr_reader :url, :login, :password
+    attr_reader :session, :url, :login, :password
 
     def submit_otp_form
       print "Enter OTP: "
@@ -39,7 +39,6 @@ module KindleNotebook
       session.check("rememberMe")
       session.first("#signInSubmit").click
       submit_otp_form
-      session.save_cookies
     end
   end
 end
