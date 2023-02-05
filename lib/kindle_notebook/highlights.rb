@@ -14,10 +14,11 @@ module KindleNotebook
     def fetch_all
       session.find("#cover").find("li", match: :first).find("a").click # TODO: iterate books
       open_notebook
-      items = highlight_items
+      items, total = highlight_items
+      close_notebook
       open_search
       sleep 1
-      items.each { |item| fetch(item[:text], item[:page]) }
+      items.each_with_index { |item, index| fetch(item[:text], item[:page], index, total) }
       highlights
     end
 
@@ -28,13 +29,11 @@ module KindleNotebook
 
     def highlight_items
       content = session.find("div", class: "notebook-content").all("ion-item")
-      puts "#{content.count} highlights in this book"
-      parsed = content.map do |item|
+      puts "#{content.count} highlights in this book \n"
+      [content.map do |item|
         { text: item.find(".notebook-editable-item-black").text,
           page: item.find(".notebook-editable-item-grey").text.split(" ").last }
-      end
-      close_notebook
-      parsed
+      end, content.count]
     end
 
     def open_notebook
@@ -46,9 +45,9 @@ module KindleNotebook
       session.find("#notebook-header-close-img").click
     end
 
-    def fetch(text, page)
-      puts "fetching #{text} from page #{page}..."
+    def fetch(text, page, index, total)
       parsed_text = parse_text(text)
+      puts "[#{index + 1}/#{total}] fetching \"#{parsed_text}\" from page #{page}... "
       return if parsed_text.split(" ").count > WORDS_LIMIT
 
       context = search_highlight(text, page)
@@ -65,12 +64,12 @@ module KindleNotebook
     end
 
     def parse_text(text)
-      text.gsub("...", "")
+      text.gsub(/[^0-9a-zA-Z -]+/, "").strip
     end
 
     def search_highlight(text, page)
       session.find("input", class: "searchbar-input").set(text)
-      sleep 3 # wait for search response
+      sleep 1 while session.has_css?(".kg-loader") # wait for search response
       context = nil
       if session.has_css?(".search-results")
         context = get_context(page)
