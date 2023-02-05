@@ -1,8 +1,6 @@
 # KindleNotebook
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/kindle_notebook`. To experiment with that code, run `bin/console` for an interactive prompt.
+Fetch your Kindle Highlights along with their context.
 
 ## Installation
 
@@ -18,7 +16,22 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+Create a `.env` file and add your Amazon credentials to it:
+```sh
+cp -n .env_sample .env
+```
+
+Sign in:
+```rb
+session = KindleNotebook::AmazonAuth.new.sign_in
+```
+
+Fetch Kindle Highlights:
+```rb
+client = KindleNotebook::Highlights.new(session)
+highlights = client.fetch_all
+client.highlights
+```
 
 ## Development
 
