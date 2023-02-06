@@ -26,7 +26,7 @@ Sign in:
 session = KindleNotebook::AmazonAuth.new.sign_in
 ```
 
-Fetch Kindle Highlights:
+Click on the book you want then fetch your highlights with:
 ```rb
 client = KindleNotebook::Highlights.new(session)
 highlights = client.fetch_all

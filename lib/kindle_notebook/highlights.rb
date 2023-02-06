@@ -2,17 +2,17 @@
 
 module KindleNotebook
   class Highlights
-    attr_reader :highlights
+    attr_reader :highlights, :book
 
     WORDS_LIMIT = 3
 
     def initialize(session = AmazonAuth.new.sign_in)
       @session = session
       @highlights = []
+      @book = session.find(".fixed-book-title").text
     end
 
     def fetch_all
-      session.find("#cover").find("li", match: :first).find("a").click # TODO: iterate books
       open_notebook
       items, total = highlight_items
       close_notebook
