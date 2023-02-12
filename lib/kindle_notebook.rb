@@ -18,12 +18,13 @@ module KindleNotebook
     Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
 
-  def self.to_csv_file(arr)
+  def self.to_csv_file(arr, file_name = "output.csv")
     headers = arr.first.keys
     r = CSV.generate do |csv|
       csv << headers
       arr.each { |x| csv << x.values }
     end
-    File.write("output.csv", r)
+    File.write(file_name, r)
+    file_name
   end
 end
