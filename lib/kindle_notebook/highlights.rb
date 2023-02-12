@@ -9,7 +9,7 @@ module KindleNotebook
     def initialize(session = AmazonAuth.new.sign_in)
       @session = session
       @highlights = []
-      @book = session.find(".fixed-book-title").text
+      @book = book_title
     end
 
     def fetch_all
@@ -26,6 +26,12 @@ module KindleNotebook
 
     attr_reader :session
     attr_writer :highlights
+
+    def book_title
+      raise StandardError, "Select a book first" unless session.has_css?(".fixed-book-title")
+
+      session.find(".fixed-book-title").text
+    end
 
     def highlight_items
       content = session.find("div", class: "notebook-content").all("ion-item")
@@ -47,7 +53,7 @@ module KindleNotebook
 
     def fetch(text, page, index, total)
       parsed_text = parse_text(text)
-      puts "[#{index + 1}/#{total}] fetching \"#{parsed_text}\" from page #{page}... "
+      puts "[#{index + 1}/#{total}] \"#{parsed_text}\" page #{page}... "
       return if parsed_text.split(" ").count > WORDS_LIMIT
 
       context = search_highlight(text, page)
@@ -64,7 +70,7 @@ module KindleNotebook
     end
 
     def parse_text(text)
-      text.gsub(/[^0-9a-zA-Z -]+/, "").strip
+      text.downcase.gsub(/[^0-9a-zA-Z -]+/, "").strip
     end
 
     def search_highlight(text, page)
@@ -72,7 +78,7 @@ module KindleNotebook
       sleep 1 while session.has_css?(".kg-loader") # wait for search response
       context = nil
       if session.has_css?(".search-results")
-        context = get_context(page)
+        context = get_context(text, page)
       else
         puts "no search results for #{text}"
       end
@@ -84,9 +90,20 @@ module KindleNotebook
       session.find(".search-results", wait: 5).all(".search-item")
     end
 
-    def get_context(page)
+    def get_context(text, page)
       page_result = search_results.find { |r| r.find(".search-item-label").text.split(" ").last == page }
-      page_result.find(".search-item-context").text
+      if page_result.nil?
+        puts "no context for #{text}"
+        return ""
+      end
+
+      context = page_result.find(".search-item-context").text
+      parse_context(text, context)
+    end
+
+    def parse_context(text, context)
+      sentences = context.scan(/\s+[^.!?]*[.!?]/) # match sentences
+      sentences.select { |s| s.include?(text) }.first&.strip || context
     end
 
     def clear_search
