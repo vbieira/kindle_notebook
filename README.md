@@ -30,12 +30,13 @@ Click on the book you want then fetch your highlights with:
 ```rb
 client = KindleNotebook::Highlights.new(session)
 highlights = client.fetch_all
-client.highlights #=> [{:text=>"iron-clad", :page=>"3", :context=>"She has a busy life over which she maintains iron-clad control."},...
+client.highlights
+#=> [{:text=>"iron-clad", :page=>"3", :context=>"She has a busy life over which she maintains iron-clad control."},...
 ```
 
-To write to a CSV file (`output.csv`):
+To write to a CSV file:
 ```rb
-KindleNotebook.to_csv_file(highlights)
+KindleNotebook.to_csv_file(highlights) #=> "output.csv"
 ```
 
 ## Development
