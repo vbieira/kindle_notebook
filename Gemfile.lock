@@ -5,6 +5,7 @@ PATH
       capybara
       capybara-sessionkeeper
       dotenv
+      pry
       selenium-webdriver
 
 GEM
@@ -25,16 +26,21 @@ GEM
     capybara-sessionkeeper (0.2.0)
       capybara
       selenium-webdriver
+    coderay (1.1.3)
     diff-lcs (1.5.0)
     dotenv (2.8.1)
     json (2.6.3)
     matrix (0.4.2)
+    method_source (1.0.0)
     mini_mime (1.1.2)
     nokogiri (1.14.0-x86_64-linux)
       racc (~> 1.4)
     parallel (1.22.1)
     parser (3.2.0.0)
       ast (~> 2.4.1)
+    pry (0.14.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     public_suffix (5.0.1)
     racc (1.6.2)
     rack (3.0.4.1)
