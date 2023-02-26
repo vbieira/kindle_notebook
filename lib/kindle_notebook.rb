@@ -6,6 +6,8 @@ require "dotenv"
 require "csv"
 
 require_relative "kindle_notebook/amazon_auth"
+require_relative "kindle_notebook/book"
+require_relative "kindle_notebook/client"
 require_relative "kindle_notebook/highlights"
 require_relative "kindle_notebook/version"
 
@@ -18,7 +20,7 @@ module KindleNotebook
     Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
 
-  def self.to_csv_file(arr, file_name = "output.csv")
+  def self.to_csv(arr, file_name = "output.csv")
     headers = arr.first.keys
     r = CSV.generate do |csv|
       csv << headers

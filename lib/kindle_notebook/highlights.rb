@@ -4,21 +4,22 @@ module KindleNotebook
   class Highlights
     attr_reader :highlights, :book
 
-    WORDS_LIMIT = 3
+    # To only fetch highlights that have a word count within range
+    MIN_WORDS = 1
+    MAX_WORDS = 3
 
-    def initialize(session = AmazonAuth.new.sign_in)
+    Highlight = Struct.new(:text, :page, :context)
+
+    def initialize(session)
       @session = session
       @highlights = []
-      @book = book_title
     end
 
-    def fetch_all
+    def fetch
       open_notebook
-      items, total = highlight_items
-      close_notebook
-      open_search
-      sleep 1
-      items.each_with_index { |item, index| fetch(item[:text], item[:page], index, total) }
+      return [] unless highlights?
+
+      add_highlights
       highlights
     end
 
@@ -27,10 +28,15 @@ module KindleNotebook
     attr_reader :session
     attr_writer :highlights
 
-    def book_title
-      raise StandardError, "Select a book first" unless session.has_css?(".fixed-book-title")
+    def highlights?
+      session.has_selector?("div", class: "notebook-content")
+    end
 
-      session.find(".fixed-book-title").text
+    def add_highlights
+      items, total = highlight_items
+      close_notebook
+      open_search
+      items.each_with_index { |item, index| add_highlight(item[:text], item[:page], index, total) }
     end
 
     def highlight_items
@@ -51,18 +57,19 @@ module KindleNotebook
       session.find("#notebook-header-close-img").click
     end
 
-    def fetch(text, page, index, total)
+    def add_highlight(text, page, index, total)
       parsed_text = parse_text(text)
       puts "[#{index + 1}/#{total}] \"#{parsed_text}\" page #{page}... "
-      return if parsed_text.split(" ").count > WORDS_LIMIT
+      return unless (MIN_WORDS..MAX_WORDS).include?(parsed_text.split(" ").count)
 
       context = search_highlight(text, page)
-      highlights.push(text: parsed_text, page: page, context: context)
+      highlights.push(Highlight.new(text: parsed_text, page: page, context: context))
     end
 
     def open_search
       show_toolbar
       session.first(:xpath, '//ion-button[@item-i-d="top_menu_search"]').click
+      sleep 1
     end
 
     def show_toolbar

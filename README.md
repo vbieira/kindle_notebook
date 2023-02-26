@@ -1,6 +1,6 @@
 # KindleNotebook
 
-Fetch your Kindle Highlights along with their context.
+Fetch your Kindle Highlights along with their context using the Selenium Webdriver
 
 ## Installation
 
@@ -21,22 +21,24 @@ Create a `.env` file and add your Amazon credentials to it:
 cp -n .env_sample .env
 ```
 
-Sign in:
+The sign in method currently depends on the two-step verification being enabled for the Amazon account. It will prompt a request for the OTP code. To sign in:
 ```rb
-session = KindleNotebook::AmazonAuth.new.sign_in
+session = KindleNotebook::AmazonAuth.new.sign_in # => #<Capybara::Session>
 ```
 
 Click on the book you want then fetch your highlights with:
 ```rb
-client = KindleNotebook::Highlights.new(session)
-highlights = client.fetch_all
-client.highlights
-#=> [{:text=>"iron-clad", :page=>"3", :context=>"She has a busy life over which she maintains iron-clad control."},...
+client = KindleNotebook::Client.new(session)
+client.books # => #<KindleNotebook::Book:0x00007f0847c4e388 @author="Cannon, Jason", @highlights=nil, @session=#<Capybara::Session>, @title="Docker: A Project-Based Approach to Learning">
+book = client.books[0] # => select a book
+book.open
+book.highlights # => ... @highlights=[#<struct KindleNotebook::Highlights::Highlight text="journald", page="120", context="If you get stuck, the logging component of systemd, called journald, can also help.">,...]
 ```
 
 To write to a CSV file:
 ```rb
-KindleNotebook.to_csv_file(highlights) #=> "output.csv"
+KindleNotebook.to_csv(highlights) # => "output.csv"
+# TODO: example
 ```
 
 ## Development
