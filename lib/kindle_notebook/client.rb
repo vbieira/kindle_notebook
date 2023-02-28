@@ -1,24 +1,23 @@
 # frozen_string_literal: true
 
 module KindleNotebook
-  class Client
-    attr_reader :books
+  module Client
+    class << self
+      def books
+        @books ||= fetch_books
+      end
 
-    def initialize(session)
-      @session = session
-      @books = fetch_books
-    end
+      def session
+        @session ||= KindleNotebook::AmazonAuth.new.sign_in
+      end
 
-    private
+      private
 
-    attr_reader :session
-    attr_writer :books
-
-    def fetch_books
-      session.find("ul#cover").all("li").map do |element|
-        Book.new(element.find("div", id: /author-/).text,
-                 element.find("div", id: /title-/).text,
-                 session)
+      def fetch_books
+        session.find("ul#cover").all("li").map do |element|
+          Book.new(element.find("div", id: /author-/).text,
+                   element.find("div", id: /title-/).text)
+        end
       end
     end
   end

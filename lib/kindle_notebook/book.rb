@@ -2,13 +2,12 @@
 
 module KindleNotebook
   class Book
-    attr_reader :author, :title, :session
+    attr_reader :author, :title
 
-    def initialize(author, title, session)
+    def initialize(author, title)
       @author = author
       @title = title
       @highlights = nil
-      @session = session
     end
 
     def highlights
@@ -16,9 +15,14 @@ module KindleNotebook
     end
 
     def open
-      puts "Opening \"#{title}\""
       session.visit(ENV["KINDLE_READER_URL"]) unless session.has_selector?("p", text: title)
       session.find("p", text: title).click
+    end
+
+    private
+
+    def session
+      Client.session
     end
   end
 end

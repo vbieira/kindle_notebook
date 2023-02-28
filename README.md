@@ -21,18 +21,12 @@ Create a `.env` file and add your Amazon credentials to it:
 cp -n .env_sample .env
 ```
 
-The sign in method currently depends on the two-step verification being enabled for the Amazon account. It will prompt a request for the OTP code. To sign in:
+To get a book's highlights:
 ```rb
-session = KindleNotebook::AmazonAuth.new.sign_in # => #<Capybara::Session>
-```
-
-Click on the book you want then fetch your highlights with:
-```rb
-client = KindleNotebook::Client.new(session)
-client.books # => #<KindleNotebook::Book:0x00007f0847c4e388 @author="Cannon, Jason", @highlights=nil, @session=#<Capybara::Session>, @title="Docker: A Project-Based Approach to Learning">
-book = client.books[0] # => select a book
+books = KindleNotebook::Client.books # => [#<KindleNotebook::Book:0x00007f0847c4e388 @author="Cannon, Jason", @highlights=nil, @title="Docker: A Project-Based Approach to Learning">, ...]
+book = books[0]
 book.open
-book.highlights # => ... @highlights=[#<struct KindleNotebook::Highlights::Highlight text="journald", page="120", context="If you get stuck, the logging component of systemd, called journald, can also help.">,...]
+book.highlights # => [#<struct KindleNotebook::Highlights::Highlight text="journald", page="120", context="If you get stuck, the logging component of systemd, called journald, can also help.">, #<struct KindleNotebook::Highlights::Highlight text="swarm", page="225", context="Docker Swarm In this chapter, you're going to learn how to create and use a Docker">, ...]
 ```
 
 To write to a CSV file:
