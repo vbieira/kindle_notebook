@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+KindleNotebook.configure do |config|
+  config.url = ENV["KINDLE_READER_URL"]
+  config.login = ENV["EMAIL"]
+  config.password = ENV["PASSWORD"]
+  config.driver = ENV["SELENIUM_DRIVER"]
+end
