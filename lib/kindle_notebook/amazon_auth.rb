@@ -6,7 +6,7 @@ module KindleNotebook
       @url = ENV["KINDLE_READER_URL"]
       @login = ENV["EMAIL"]
       @password = ENV["PASSWORD"]
-      @session = Capybara::Session.new(:chrome)
+      @session = Capybara::Session.new(ENV["SELENIUM_DRIVER"].to_sym)
     end
 
     def sign_in
