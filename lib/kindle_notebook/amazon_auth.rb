@@ -2,6 +2,7 @@
 
 module KindleNotebook
   class AmazonAuth
+    # TODO: this could be in the gem's configuration instead
     def initialize
       @url = ENV["KINDLE_READER_URL"]
       @login = ENV["EMAIL"]
@@ -11,7 +12,7 @@ module KindleNotebook
 
     def sign_in
       session.visit(url)
-      return session if valid_cookies
+      return session if valid_cookies?
 
       submit_sign_in_form
       session.save_cookies
@@ -22,11 +23,11 @@ module KindleNotebook
 
     attr_reader :session, :url, :login, :password
 
-    def valid_cookies
+    def valid_cookies?
       session.find_latest_cookie_file
       session.restore_cookies
       session.refresh
-      session.has_current_path?('/kindle-library')
+      session.has_current_path?("/kindle-library")
     end
 
     def submit_otp_form
@@ -42,7 +43,11 @@ module KindleNotebook
       session.fill_in("ap_password", with: password)
       session.check("rememberMe")
       session.first("#signInSubmit").click
-      submit_otp_form
+      submit_otp_form if mfa?
+    end
+
+    def mfa?
+      session.current_path.match?(%r{ap/mfa})
     end
   end
 end
