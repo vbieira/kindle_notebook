@@ -11,8 +11,9 @@ module KindleNotebook
 
       def fetch_books
         KindleNotebook.session.find("ul#cover").all("li").map do |element|
-          Book.new(element.find("div", id: /author-/).text,
-                   element.find("div", id: /title-/).text)
+          Book.new(author: element.find("div", id: /author-/).text,
+                   title: element.find("div", id: /title-/).text,
+                   asin: element.find("div", match: :first)["data-asin"])
         end
       end
     end

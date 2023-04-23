@@ -2,9 +2,8 @@
 
 module KindleNotebook
   class AmazonAuth
-    # TODO: this could be in the gem's configuration instead
     def initialize
-      @auth_session = Capybara::Session.new(ENV["SELENIUM_DRIVER"].to_sym)
+      @auth_session = Capybara::Session.new(KindleNotebook.configuration.driver.to_sym)
     end
 
     def sign_in
@@ -36,11 +35,15 @@ module KindleNotebook
 
     def submit_sign_in_form
       auth_session.click_button("Sign in with your account", match: :first)
-      auth_session.fill_in("ap_email", with: KindleNotebook.configuration.login)
-      auth_session.fill_in("ap_password", with: KindleNotebook.configuration.password)
+      fill_in_credentials
       auth_session.check("rememberMe")
       auth_session.first("#signInSubmit").click
       submit_otp_form if mfa?
+    end
+
+    def fill_in_credentials
+      auth_session.fill_in("ap_email", with: KindleNotebook.configuration.login)
+      auth_session.fill_in("ap_password", with: KindleNotebook.configuration.password)
     end
 
     def mfa?

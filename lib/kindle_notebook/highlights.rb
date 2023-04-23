@@ -2,7 +2,7 @@
 
 module KindleNotebook
   class Highlights
-    attr_reader :highlights, :book
+    attr_accessor :book
 
     # To only fetch highlights that have a word count within range
     MIN_WORDS = 1
@@ -10,42 +10,40 @@ module KindleNotebook
 
     Highlight = Struct.new(:text, :page, :context)
 
-    def initialize(session)
-      @session = session
-      @highlights = []
+    def initialize(book)
+      @book = book
     end
 
     def fetch
       open_notebook
-      return [] unless highlights?
-
       add_highlights
-      highlights
     end
 
     private
 
-    attr_reader :session
-    attr_writer :highlights
-
-    def highlights?
-      session.has_selector?("div", class: "notebook-content")
+    def session
+      KindleNotebook.session
     end
 
     def add_highlights
-      items, total = highlight_items
+      # TODO: interrupt and still have highlights
+      items = notebook_highlights
       close_notebook
       open_search
-      items.each_with_index { |item, index| add_highlight(item[:text], item[:page], index, total) }
+      fetch_highlights_with_context(items)
     end
 
-    def highlight_items
+    # fetch all highlights (without context) from notebook
+    def notebook_highlights
       content = session.find("div", class: "notebook-content").all("ion-item")
       puts "#{content.count} highlights in this book \n"
-      [content.map do |item|
-        { text: item.find(".notebook-editable-item-black").text,
-          page: item.find(".notebook-editable-item-grey").text.split(" ").last }
-      end, content.count]
+      book.highlights_count = content.count
+      content.map { |h| parse_notebook_highlight(h) }
+    end
+
+    def parse_notebook_highlight(item)
+      { text: item.find(".notebook-editable-item-black").text,
+        page: item.find(".notebook-editable-item-grey").text.split(" ").last }
     end
 
     def open_notebook
@@ -57,13 +55,20 @@ module KindleNotebook
       session.find("#notebook-header-close-img").click
     end
 
-    def add_highlight(text, page, index, total)
-      parsed_text = parse_text(text)
-      puts "[#{index + 1}/#{total}] \"#{parsed_text}\" page #{page}... "
-      return unless (MIN_WORDS..MAX_WORDS).include?(parsed_text.split(" ").count)
+    def fetch_highlights_with_context(items)
+      items.each_with_index do |item, index|
+        parsed_text = parse_text(item[:text])
+        page = item[:page]
+        puts "[#{index + 1}/#{book.highlights_count}] \"#{parsed_text}\" page #{page}... "
+        next unless (MIN_WORDS..MAX_WORDS).include?(parsed_text.split(" ").count)
 
+        add_highlight(parsed_text, page)
+      end
+    end
+
+    def add_highlight(text, page)
       context = search_highlight(text, page)
-      highlights.push(Highlight.new(text: parsed_text, page: page, context: context))
+      book.highlights.push(Highlight.new(text: text, page: page, context: context))
     end
 
     def open_search
@@ -73,7 +78,7 @@ module KindleNotebook
     end
 
     def show_toolbar
-      session.find("div", class: "fixed-book-title", wait: 5).hover
+      session.find("div", match: :first).hover
     end
 
     def parse_text(text)
