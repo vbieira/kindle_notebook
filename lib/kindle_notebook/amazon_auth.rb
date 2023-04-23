@@ -11,19 +11,23 @@ module KindleNotebook
 
     def sign_in
       session.visit(url)
-      if session.find_latest_cookie_file
-        session.restore_cookies
-        session.refresh
-      else
-        submit_sign_in_form
-        session.save_cookies
-      end
+      return session if valid_cookies
+
+      submit_sign_in_form
+      session.save_cookies
       session
     end
 
     private
 
     attr_reader :session, :url, :login, :password
+
+    def valid_cookies
+      session.find_latest_cookie_file
+      session.restore_cookies
+      session.refresh
+      session.has_current_path?('/kindle-library')
+    end
 
     def submit_otp_form
       print "Enter OTP: "
