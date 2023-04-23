@@ -21,18 +21,39 @@ Create a `.env` file and add your Amazon credentials to it:
 cp -n .env_sample .env
 ```
 
-To get a book's highlights:
+To get the highlights from a book:
 ```rb
-books = KindleNotebook::Client.books # => [#<KindleNotebook::Book:0x00007f0847c4e388 @author="Cannon, Jason", @highlights=nil, @title="Docker: A Project-Based Approach to Learning">, ...]
-book = books[0]
-book.open
-book.highlights # => [#<struct KindleNotebook::Highlights::Highlight text="journald", page="120", context="If you get stuck, the logging component of systemd, called journald, can also help.">, #<struct KindleNotebook::Highlights::Highlight text="swarm", page="225", context="Docker Swarm In this chapter, you're going to learn how to create and use a Docker">, ...]
+books = KindleNotebook::Client.books
+book = books.first.fetch_highlights
+book.highlights
 ```
 
 To write to a CSV file:
 ```rb
 KindleNotebook.to_csv(highlights) # => "output.csv"
 # TODO: example
+# TODO: book.to_csv (save csv file with name of the book and highlights count?)
+```
+
+## Examples
+
+Book:
+```rb
+#<KindleNotebook::Book:0x00007f0847c4e388
+  @asin="B09FJ3411G",
+  @author="Cannon, Jason",
+  @highlights=[],
+  @highlights_count=13,
+  @title="Docker: A Project-Based Approach to Learning">
+```
+
+<!-- TODO: create highligh class -->
+Highlight:
+```rb
+#<struct KindleNotebook::Highlights::Highlight
+  text="journald",
+  page="120",
+  context="If you get stuck, the logging component of systemd, called journald, can also help.">
 ```
 
 ## Development
@@ -43,7 +64,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/kindle_notebook. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/kindle_notebook/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/vbieira/kindle_notebook. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/vbieira/kindle_notebook/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
