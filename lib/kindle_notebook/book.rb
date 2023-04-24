@@ -18,6 +18,11 @@ module KindleNotebook
       Highlights.new(self).fetch
     end
 
+    def to_csv_file
+      headers = highlights.first.attributes
+      Helpers.to_csv_file(headers, highlights, "#{title} - #{author}.csv")
+    end
+
     private
 
     def session

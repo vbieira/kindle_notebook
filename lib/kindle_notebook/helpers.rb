@@ -2,13 +2,11 @@
 
 module KindleNotebook
   module Helpers
-    def self.to_csv(arr, file_name = "output.csv")
-      headers = arr.first.keys
-      r = CSV.generate do |csv|
-        csv << headers
-        arr.each { |x| csv << x.values }
-      end
-      File.write(file_name, r)
+    def self.to_csv_file(headers, list, file_name = "output.csv")
+      full_csv = ""
+      full_csv += CSV.generate_line(headers)
+      list.each { |element| full_csv += element.to_csv }
+      File.write(file_name, full_csv)
       file_name
     end
 

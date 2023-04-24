@@ -16,5 +16,13 @@ module KindleNotebook
     def book
       @book ||= Client.books.find { |b| b.asin == book_asin }
     end
+
+    def attributes
+      instance_variables.map { |v| v.to_s.gsub("@", "").to_sym }
+    end
+
+    def to_csv
+      CSV::Row.new(attributes, attributes.map { |a| instance_variable_get("@#{a}") }).to_s
+    end
   end
 end
