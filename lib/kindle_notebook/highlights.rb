@@ -4,11 +4,9 @@ module KindleNotebook
   class Highlights
     attr_accessor :book
 
-    # To only fetch highlights that have a word count within range
-    MIN_WORDS = 1
-    MAX_WORDS = 3
-
-    Highlight = Struct.new(:text, :page, :context)
+    # Range of acceptable word counts for a highlight
+    MIN_HIGHLIGHT_WORDS = 1
+    MAX_HIGHLIGHT_WORDS = 3
 
     def initialize(book)
       @book = book
@@ -17,6 +15,7 @@ module KindleNotebook
     def fetch
       open_notebook
       add_highlights
+      book.highlights
     end
 
     private
@@ -26,7 +25,6 @@ module KindleNotebook
     end
 
     def add_highlights
-      # TODO: interrupt and still have highlights
       items = notebook_highlights
       close_notebook
       open_search
@@ -48,7 +46,7 @@ module KindleNotebook
 
     def open_notebook
       show_toolbar
-      session.first(:xpath, '//ion-button[@item-i-d="top_menu_notebook"]').click
+      session.first(:xpath, '//ion-button[@item-i-d="top_menu_notebook"]', wait: 5).click
     end
 
     def close_notebook
@@ -57,65 +55,66 @@ module KindleNotebook
 
     def fetch_highlights_with_context(items)
       items.each_with_index do |item, index|
-        parsed_text = parse_text(item[:text])
+        parsed_text = Helpers.clean_up_text(item[:text])
         page = item[:page]
         puts "[#{index + 1}/#{book.highlights_count}] \"#{parsed_text}\" page #{page}... "
-        next unless (MIN_WORDS..MAX_WORDS).include?(parsed_text.split(" ").count)
+        next unless within_range?(parsed_text)
 
-        add_highlight(parsed_text, page)
+        add_highlight(parsed_text, page, item[:text])
       end
     end
 
-    def add_highlight(text, page)
-      context = search_highlight(text, page)
-      book.highlights.push(Highlight.new(text: text, page: page, context: context))
+    def within_range?(text)
+      (MIN_HIGHLIGHT_WORDS..MAX_HIGHLIGHT_WORDS).include?(text.split(" ").count)
+    end
+
+    def add_highlight(text, page, raw_text)
+      context, raw_context = search_highlight_context(text, page)
+      new_highlight = Highlight.new(text: text,
+                                    page: page,
+                                    context: context,
+                                    book_asin: book.asin,
+                                    raw_text: raw_text,
+                                    raw_context: raw_context)
+      book.highlights.push(new_highlight)
     end
 
     def open_search
       show_toolbar
-      session.first(:xpath, '//ion-button[@item-i-d="top_menu_search"]').click
-      sleep 1
+      session.first(:xpath, '//ion-button[@item-i-d="top_menu_search"]', wait: 2).click
     end
 
     def show_toolbar
-      session.find("div", match: :first).hover
+      session.first(:xpath, "//ion-header", wait: 2).hover
     end
 
-    def parse_text(text)
-      text.downcase.gsub(/[^0-9a-zA-Z -]+/, "").strip
+    def search_highlight_context(text, page)
+      search_highlight(text)
+      context = nil
+      raw_context = nil
+      context, raw_context = context_from_element(text, page) if session.has_css?(".search-results")
+      clear_search
+      [context, raw_context]
     end
 
-    def search_highlight(text, page)
+    def search_highlight(text)
       session.find("input", class: "searchbar-input").set(text)
       sleep 1 while session.has_css?(".kg-loader") # wait for search response
-      context = nil
-      if session.has_css?(".search-results")
-        context = get_context(text, page)
-      else
-        puts "no search results for #{text}"
-      end
-      clear_search
-      context
     end
 
     def search_results
       session.find(".search-results", wait: 5).all(".search-item")
     end
 
-    def get_context(text, page)
+    def context_from_element(text, page)
       page_result = search_results.find { |r| r.find(".search-item-label").text.split(" ").last == page }
       if page_result.nil?
         puts "no context for #{text}"
-        return ""
+        return ["", ""]
       end
 
       context = page_result.find(".search-item-context").text
-      parse_context(text, context)
-    end
-
-    def parse_context(text, context)
-      sentences = context.scan(/\s+[^.!?]*[.!?]/) # match sentences
-      sentences.select { |s| s.include?(text) }.first&.strip || context
+      [Helpers.sentence_with_word(context, text), context]
     end
 
     def clear_search

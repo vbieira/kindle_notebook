@@ -42,7 +42,7 @@ Book:
 #<KindleNotebook::Book:0x00007f0847c4e388
   @asin="B09FJ3411G",
   @author="Cannon, Jason",
-  @highlights=[],
+  @highlights=[#<KindleNotebook::Highlight:0x00007f46959d61f0 @book_asin="B09FJ3411G", ...],
   @highlights_count=13,
   @title="Docker: A Project-Based Approach to Learning">
 ```
@@ -50,10 +50,13 @@ Book:
 <!-- TODO: create highligh class -->
 Highlight:
 ```rb
-#<struct KindleNotebook::Highlights::Highlight
-  text="journald",
-  page="120",
-  context="If you get stuck, the logging component of systemd, called journald, can also help.">
+#<KindleNotebook::Highlight:0x00007f46959d61f0
+  @book_asin="B09FJ3411G",
+  @context="If you get stuck, the logging component of systemd, called journald, can also help.",
+  @page="120",
+  @raw_context="used, for example. If you get stuck, the logging component of systemd, called journald, can also help. This journald command displays the last 20 entries in the",
+  @raw_text="journald,",
+  @text="journald">
 ```
 
 ## Development

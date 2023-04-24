@@ -11,6 +11,7 @@ require_relative "kindle_notebook/client"
 require_relative "kindle_notebook/configuration"
 require_relative "kindle_notebook/helpers"
 require_relative "kindle_notebook/highlights"
+require_relative "kindle_notebook/highlight"
 require_relative "kindle_notebook/version"
 
 Dotenv.load
