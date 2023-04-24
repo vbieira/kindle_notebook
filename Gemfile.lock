@@ -4,7 +4,7 @@ PATH
     kindle_notebook (0.1.0)
       capybara (~> 3.39)
       capybara-sessionkeeper (~> 0.2.0)
-      dotenv (>= 2.8.1)
+      dotenv (~> 2.8, >= 2.8.1)
       pry (~> 0.14.2)
       selenium-webdriver (~> 4.9)
 

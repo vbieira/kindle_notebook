@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "capybara", "~> 3.39"
   spec.add_dependency "capybara-sessionkeeper", "~> 0.2.0"
-  spec.add_dependency "dotenv",  ">= 2.8.1"
+  spec.add_dependency "dotenv", "~> 2.8", ">= 2.8.1"
   spec.add_dependency "pry", "~> 0.14.2"
   spec.add_dependency "selenium-webdriver", "~> 4.9"
 
