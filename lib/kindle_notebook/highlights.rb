@@ -4,10 +4,6 @@ module KindleNotebook
   class Highlights
     attr_accessor :book
 
-    # Range of acceptable word counts for a highlight
-    MIN_HIGHLIGHT_WORDS = 1
-    MAX_HIGHLIGHT_WORDS = 3
-
     def initialize(book)
       @book = book
     end
@@ -65,7 +61,8 @@ module KindleNotebook
     end
 
     def within_range?(text)
-      (MIN_HIGHLIGHT_WORDS..MAX_HIGHLIGHT_WORDS).include?(text.split(" ").count)
+      range = KindleNotebook.configuration.min_highlight_words..KindleNotebook.configuration.max_highlight_words
+      range.include?(text.split(" ").count)
     end
 
     def add_highlight(text, page, raw_text)
