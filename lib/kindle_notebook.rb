@@ -2,7 +2,6 @@
 
 require "capybara"
 require "capybara/sessionkeeper"
-require "dotenv"
 require "csv"
 require "selenium-webdriver"
 
@@ -15,14 +14,12 @@ require_relative "kindle_notebook/highlights"
 require_relative "kindle_notebook/highlight"
 require_relative "kindle_notebook/version"
 
-Dotenv.load
-
 module KindleNotebook
   class Error < StandardError; end
 
   Capybara.register_driver :chrome do |app|
     options = Selenium::WebDriver::Chrome::Options.new
-    options.add_argument("--headless") if configuration.headless
+    options.add_argument("--headless") if configuration.headless_mode
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
 
@@ -31,7 +28,7 @@ module KindleNotebook
 
   Capybara.register_driver :firefox do |app|
     options = Selenium::WebDriver::Firefox::Options.new
-    options.add_argument("--headless") if configuration.headless
+    options.add_argument("--headless") if configuration.headless_mode
 
     Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
   end

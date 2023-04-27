@@ -3,7 +3,7 @@
 module KindleNotebook
   class AmazonAuth
     def initialize
-      @auth_session = Capybara::Session.new(KindleNotebook.configuration.driver.to_sym)
+      @auth_session = Capybara::Session.new(KindleNotebook.configuration.selenium_driver.to_sym)
     end
 
     def sign_in

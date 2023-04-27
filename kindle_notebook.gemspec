@@ -36,8 +36,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "capybara-sessionkeeper", "~> 0.2.0"
   spec.add_dependency "selenium-webdriver", "~> 4.9"
 
-  spec.add_development_dependency "pry", "~> 0.14.2"
   spec.add_development_dependency "dotenv", "~> 2.8", ">= 2.8.1"
+  spec.add_development_dependency "pry", "~> 0.14.2"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

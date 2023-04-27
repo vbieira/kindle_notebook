@@ -1,9 +1,16 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require "dotenv"
+
+Dotenv.load
+
 KindleNotebook.configure do |config|
+  config.headless_mode = ENV["HEADLESS_MODE"] == "true"
+  config.login = ENV["AMAZON_EMAIL"]
+  config.password = ENV["AMAZON_PASSWORD"]
+  config.selenium_driver = ENV["SELENIUM_DRIVER"]
   config.url = ENV["KINDLE_READER_URL"]
-  config.login = ENV["EMAIL"]
-  config.password = ENV["PASSWORD"]
-  config.driver = ENV["SELENIUM_DRIVER"]
+  config.min_highlight_words = ENV["MIN_HIGHLIGHT_WORDS"]
+  config.max_highlight_words = ENV["MAX_HIGHLIGHT_WORDS"]
 end
