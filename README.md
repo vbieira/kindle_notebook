@@ -20,11 +20,6 @@ $ gem install kindle_notebook
 
 ## Usage
 
-Create a `.env` file and add your Amazon credentials to it:
-```sh
-$ cp -n .env_sample .env
-```
-
 To get the highlights from a book:
 ```rb
 books = KindleNotebook::Client.books
