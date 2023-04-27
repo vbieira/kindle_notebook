@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["vbieira@outlook.com"]
 
   spec.summary = "Kindle Notebook"
-  spec.description = "Fetch Kindle Highlights and Notes"
+  spec.description = "Fetch your Kindle Highlights along with their context using the Selenium Webdriver"
   spec.homepage = "https://github.com/vbieira/kindle_notebook"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
@@ -34,9 +34,10 @@ Gem::Specification.new do |spec|
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "capybara", "~> 3.39"
   spec.add_dependency "capybara-sessionkeeper", "~> 0.2.0"
-  spec.add_dependency "dotenv", "~> 2.8", ">= 2.8.1"
-  spec.add_dependency "pry", "~> 0.14.2"
   spec.add_dependency "selenium-webdriver", "~> 4.9"
+
+  spec.add_development_dependency "pry", "~> 0.14.2"
+  spec.add_development_dependency "dotenv", "~> 2.8", ">= 2.8.1"
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
